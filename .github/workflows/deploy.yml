@@ -12,6 +12,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: List files after checkout
+      run: |
+        ls -alh ./yii2-app  # List the contents to ensure Dockerfile is there
+
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
       with:
@@ -20,7 +24,7 @@ jobs:
 
     - name: Build and Push Docker Image
       run: |
-        docker build -t anshu1w/yii2-app:latest ./yii2-app
+        docker build -t anshu1w/yii2-app:latest -f ./yii2-app/Dockerfile ./yii2-app
         docker push anshu1w/yii2-app:latest
 
     - name: SSH into EC2 and deploy
@@ -32,4 +36,3 @@ jobs:
         script: |
           docker pull anshu1w/yii2-app:latest
           docker stack deploy -c /home/ec2-user/devops-yii2-swarm/docker/docker-compose.yml yii2app
-
