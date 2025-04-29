@@ -14,7 +14,7 @@ jobs:
 
     - name: List files after checkout
       run: |
-        ls -alh ./yii2-app  # List the contents to ensure Dockerfile is there
+        ls -alh ./yii2-app  # List the contents of yii2-app directory to ensure Dockerfile is there
 
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
@@ -24,7 +24,7 @@ jobs:
 
     - name: Build and Push Docker Image
       run: |
-        docker build -t anshu1w/yii2-app:latest -f ./yii2-app/Dockerfile ./yii2-app
+        docker build -t anshu1w/yii2-app:latest -f ./yii2-app/Dockerfile --no-cache ./yii2-app
         docker push anshu1w/yii2-app:latest
 
     - name: SSH into EC2 and deploy
