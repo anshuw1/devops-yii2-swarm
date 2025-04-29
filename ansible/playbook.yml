@@ -1,0 +1,57 @@
+i---
+- name: Setup Yii2 App with Docker Swarm & NGINX
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Install required packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - docker
+        - nginx
+        - git
+        - php-cli
+        - php-mysqlnd
+        - php-mbstring
+        - php-xml
+
+    - name: Start and enable Docker
+      service:
+        name: docker
+        enabled: yes
+        state: started
+
+    - name: Start and enable NGINX
+      service:
+        name: nginx
+        enabled: yes
+        state: started
+
+    - name: Install Docker Compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/v2.24.7/docker-compose-linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+
+    - name: Initialize Docker Swarm
+      shell: docker swarm init || true
+
+    - name: Copy NGINX config
+      copy:
+        src: ../nginx/yii2.conf
+        dest: /etc/nginx/conf.d/yii2.conf
+
+    - name: Reload NGINX
+      shell: nginx -s reload
+
+    - name: Clone the repo
+      git:
+        repo: https://github.com/anshuw1/devops-yii2-swarm.git
+        dest: /home/ec2-user/devops-yii2-swarm
+        version: main
+
+    - name: Deploy the app
+      shell: docker stack deploy -c /home/ec2-user/devops-yii2-swarm/docker/docker-compose.yml yii2app
+

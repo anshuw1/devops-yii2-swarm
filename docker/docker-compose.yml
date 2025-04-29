@@ -1,0 +1,17 @@
+
+version: "3.9"
+
+services:
+  yii2:
+    image: anshu1w/yii2-app:latest
+    ports:
+      - "8080:80"
+    deploy:
+      replicas: 1
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: overlay
+
